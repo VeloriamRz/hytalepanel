@@ -249,7 +249,7 @@
 <div class="card">
   <div class="card-header">
     <span>{$_('console')}</span>
-    <button class="console-clear-btn" title={$_('clearConsole')} onclick={handleClear}>✕</button>
+    <button class="console-clear-btn" title={$_('clearConsole')} onclick={handleClear}>X</button>
   </div>
   <div class="console" bind:this={consoleEl} onscroll={handleScroll}>
     {#each $logs as log}

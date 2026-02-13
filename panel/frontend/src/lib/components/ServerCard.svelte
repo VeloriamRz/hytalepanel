@@ -1,16 +1,16 @@
 <script lang="ts">
+  import { appIcons } from '$lib/config/icons';
   import { _ } from 'svelte-i18n';
   import type { Server } from '$lib/stores/servers';
+  import AppIcon from './ui/AppIcon.svelte';
 
   let { 
     server, 
-    onEnter, 
     onStart,
     onStop,
     onDelete 
   }: { 
     server: Server; 
-    onEnter: () => void;
     onStart: () => void;
     onStop: () => void;
     onDelete: () => void;
@@ -49,20 +49,23 @@
   </div>
 
   <div class="server-card-actions">
-    <button class="mc-btn small primary" onclick={onEnter}>
-      {$_('enter')}
+    <button class="mc-btn small" onclick={onStart} disabled={isRunning}>
+      <span style="display: inline-flex; align-items: center; gap: 8px;">
+        <AppIcon name={appIcons.start} size={16} />
+        <span>{$_('start')}</span>
+      </span>
     </button>
-    {#if isRunning}
-      <button class="mc-btn small warning" onclick={onStop}>
-        {$_('stop')}
-      </button>
-    {:else}
-      <button class="mc-btn small" onclick={onStart}>
-        {$_('start')}
-      </button>
-    {/if}
+    <button class="mc-btn small warning" onclick={onStop} disabled={!isRunning}>
+      <span style="display: inline-flex; align-items: center; gap: 8px;">
+        <AppIcon name={appIcons.stop} size={16} />
+        <span>{$_('stop')}</span>
+      </span>
+    </button>
     <button class="mc-btn small danger" onclick={onDelete}>
-      {$_('delete')}
+      <span style="display: inline-flex; align-items: center; gap: 8px;">
+        <AppIcon name={appIcons.delete} size={16} />
+        <span>{$_('delete')}</span>
+      </span>
     </button>
   </div>
 </div>

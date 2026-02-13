@@ -7,12 +7,24 @@ export const panelExpanded = writable<boolean>(false);
 export const toasts = writable<Toast[]>([]);
 
 let toastId = 0;
+let activeToastId: number | null = null;
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
 export function showToast(message: string, type: ToastType = ''): void {
-  const id = ++toastId;
-  toasts.update((t) => [...t, { id, message, type }]);
+  const trimmedMessage = message.trim();
+  if (!trimmedMessage) return;
 
-  setTimeout(() => {
-    toasts.update((t) => t.filter((toast) => toast.id !== id));
+  const id = activeToastId ?? ++toastId;
+  activeToastId = id;
+  toasts.set([{ id, message: trimmedMessage, type }]);
+
+  if (toastTimer) {
+    clearTimeout(toastTimer);
+  }
+
+  toastTimer = setTimeout(() => {
+    toasts.set([]);
+    activeToastId = null;
+    toastTimer = null;
   }, 4000);
 }

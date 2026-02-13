@@ -7,6 +7,7 @@ import * as files from '../services/files.js';
 import * as mods from '../services/mods.js';
 import * as modtale from '../services/modtale.js';
 import * as servers from '../services/servers.js';
+import * as systemMetrics from '../services/systemMetrics.js';
 import * as updater from '../services/updater.js';
 
 interface LogsMoreParams {
@@ -76,6 +77,14 @@ export function setupSocketHandlers(io: Server): void {
     };
 
     let logStream: NodeJS.ReadableStream | null = null;
+
+    function emitSystemMetrics(): void {
+      socket.emit('system:metrics', systemMetrics.getSystemMetrics());
+    }
+
+    // Emit immediately and then every second for dashboard hardware charts
+    emitSystemMetrics();
+    const metricsInterval = setInterval(emitSystemMetrics, 1000);
 
     async function connectLogStream(tail = 0): Promise<void> {
       if (logStream) {
@@ -845,6 +854,7 @@ export function setupSocketHandlers(io: Server): void {
 
     socket.on('disconnect', () => {
       clearInterval(statusInterval);
+      clearInterval(metricsInterval);
       if (logStream) {
         try {
           (logStream as NodeJS.ReadableStream & { destroy?: () => void }).destroy?.();

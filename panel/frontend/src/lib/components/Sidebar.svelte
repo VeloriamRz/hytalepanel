@@ -1,22 +1,25 @@
 <script lang="ts">
+  import { appIcons, tabIcons } from '$lib/config/icons';
   import { _ } from 'svelte-i18n';
   import { activeTab, sidebarHidden, panelExpanded } from '$lib/stores/ui';
   import type { TabId } from '$lib/types';
-  import SetupTab from './tabs/SetupTab.svelte';
+  import BackupsTab from './tabs/BackupsTab.svelte';
+  import ConfigTab from './tabs/ConfigTab.svelte';
+  import ControlTab from './tabs/ControlTab.svelte';
   import FilesTab from './tabs/FilesTab.svelte';
   import ModsTab from './tabs/ModsTab.svelte';
-  import ControlTab from './tabs/ControlTab.svelte';
-  import ConfigTab from './tabs/ConfigTab.svelte';
-  import BackupsTab from './tabs/BackupsTab.svelte';
+  import PanelToolsTab from './tabs/PanelToolsTab.svelte';
+  import SetupTab from './tabs/SetupTab.svelte';
+  import AppIcon from './ui/AppIcon.svelte';
 
-  const tabs: TabId[] = ['control', 'setup', 'files', 'mods', 'backups', 'config'];
+  const tabs: TabId[] = ['control', 'setup', 'files', 'mods', 'backups', 'config', 'panel'];
 
   function setTab(tab: TabId): void {
     activeTab.set(tab);
   }
 
   function toggleExpand(): void {
-    panelExpanded.update(v => !v);
+    panelExpanded.update((v) => !v);
   }
 
   function hideSidebar(): void {
@@ -28,12 +31,11 @@
   <div class="card">
     <div class="tabs-header">
       {#each tabs as tab}
-        <button
-          class="tab-btn"
-          class:active={$activeTab === tab}
-          onclick={() => setTab(tab)}
-        >
-          {$_(tab)}
+        <button class="tab-btn" class:active={$activeTab === tab} onclick={() => setTab(tab)}>
+          <span style="display: inline-flex; align-items: center; gap: 8px;">
+            <AppIcon name={tabIcons[tab]} size={15} />
+            <span>{$_(tab)}</span>
+          </span>
         </button>
       {/each}
     </div>
@@ -62,11 +64,17 @@
       <BackupsTab />
     </div>
 
+    <div id="tab-panel" class="tab-content" class:active={$activeTab === 'panel'}>
+      <PanelToolsTab />
+    </div>
+
     <div class="sidebar-toolbar">
       <button id="btn-expand-panel" class="sidebar-btn" title="Expand" onclick={toggleExpand}>
-        {$panelExpanded ? '✕' : '⤢'}
+        <AppIcon name={$panelExpanded ? appIcons.chevronRight : appIcons.menu} size={16} />
       </button>
-      <button id="btn-hide-sidebar" class="sidebar-btn" title="Hide" onclick={hideSidebar}>✕</button>
+      <button id="btn-hide-sidebar" class="sidebar-btn" title="Hide" onclick={hideSidebar}>
+        <AppIcon name={appIcons.error} size={16} />
+      </button>
     </div>
   </div>
 </div>

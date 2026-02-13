@@ -207,7 +207,7 @@ export interface Toast {
   type: ToastType;
 }
 
-export type TabId = 'setup' | 'files' | 'mods' | 'backups' | 'control' | 'config';
+export type TabId = 'setup' | 'files' | 'mods' | 'backups' | 'control' | 'config' | 'panel';
 
 // Socket types
 export interface ActionStatus {
@@ -223,4 +223,21 @@ export interface CommandResult {
 export interface DownloadStatusEvent {
   status: 'starting' | 'auth-required' | 'output' | 'extracting' | 'complete' | 'done' | 'error';
   message?: string;
+}
+
+export interface SystemMetrics {
+  timestamp: number;
+  cpuPercent: number;
+  memoryPercent: number;
+  memoryUsedMb: number;
+  memoryTotalMb: number;
+  processCpuPercent: number;
+  processRssMb: number;
+  processHeapUsedMb: number;
+  processHeapTotalMb: number;
+  diskPercent: number | null;
+  diskUsedGb: number | null;
+  diskTotalGb: number | null;
+  hostUptimeSec: number;
+  processUptimeSec: number;
 }

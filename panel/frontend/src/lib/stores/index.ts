@@ -2,6 +2,7 @@
 export * from './auth';
 export * from './console';
 export * from './files';
+export * from './hardware';
 export * from './mods';
 export * from './router';
 export * from './server';

@@ -14,6 +14,7 @@ import {
   prependLogs
 } from '$lib/stores/console';
 import { currentPath, fileList, setEditorContent, setEditorStatus } from '$lib/stores/files';
+import { pushHardwareMetrics, resetHardwareMetrics } from '$lib/stores/hardware';
 import {
   apiConfigured,
   availableUpdates,
@@ -48,7 +49,8 @@ import type {
   ModProject,
   ModSearchResult,
   ModUpdatesResult,
-  ServerStatus
+  ServerStatus,
+  SystemMetrics
 } from '$lib/types';
 import { type Socket, io } from 'socket.io-client';
 import { _ } from 'svelte-i18n';
@@ -109,6 +111,7 @@ export function connectSocket(): Socket {
   socketInstance.on('disconnect', () => {
     isConnected.set(false);
     joinedServerId.set(null);
+    resetHardwareMetrics();
   });
 
   socketInstance.on('connect_error', (err: Error) => {
@@ -171,6 +174,11 @@ export function connectSocket(): Socket {
     });
     socketInstance?.emit('mods:check-config');
     socketInstance?.emit('cf:check-config');
+  });
+
+  // Host/system hardware metrics (dashboard)
+  socketInstance.on('system:metrics', (metrics: SystemMetrics) => {
+    pushHardwareMetrics(metrics);
   });
 
   // Downloader auth status
@@ -526,36 +534,48 @@ export function emit(event: string, data?: unknown): void {
   }
 }
 
+function resetServerSessionState(): void {
+  clearLogs();
+  initialLoadDone.set(false);
+  loadedCount.set(0);
+  hasMoreHistory.set(true);
+  filesReady.set({ hasJar: false, hasAssets: false, ready: false });
+  serverStatus.set({ running: false, status: 'offline', startedAt: null });
+  installedMods.set([]);
+  fileList.set([]);
+  currentPath.set('/');
+  downloaderAuth.set(false);
+
+  stopDlTimer();
+  downloadProgress.set({
+    active: false,
+    status: '',
+    percentage: 0,
+    step: 'auth',
+    authUrl: null,
+    authCode: null,
+    time: '0s'
+  });
+}
+
 export function joinServer(serverId: string): void {
   if (socketInstance) {
-    // Clear ALL previous server data
-    clearLogs();
-    initialLoadDone.set(false);
-    loadedCount.set(0);
-    hasMoreHistory.set(true);
-    filesReady.set({ hasJar: false, hasAssets: false, ready: false });
-    serverStatus.set({ running: false, status: 'offline', startedAt: null });
-    installedMods.set([]);
-    fileList.set([]);
-    currentPath.set('/');
-    downloaderAuth.set(false);
-
-    // Reset download progress completely
-    stopDlTimer();
-    downloadProgress.set({
-      active: false,
-      status: '',
-      percentage: 0,
-      step: 'auth',
-      authUrl: null,
-      authCode: null,
-      time: '0s'
-    });
+    resetServerSessionState();
 
     socketInstance.emit('server:join', serverId);
     lastJoinedServerId = serverId;
     // Navigate to server URL (this also sets activeServerId via router subscription)
     navigateToServer(serverId);
+  }
+}
+
+export function joinServerInPanel(serverId: string): void {
+  if (socketInstance) {
+    resetServerSessionState();
+
+    socketInstance.emit('server:join', serverId);
+    lastJoinedServerId = serverId;
+    activeServerId.set(serverId);
   }
 }
 

@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { appIcons } from '$lib/config/icons';
   import { _ } from 'svelte-i18n';
   import { emit } from '$lib/services/socketClient';
   import { serverStatus } from '$lib/stores/server';
   import { activeServer } from '$lib/stores/servers';
   import { addLog } from '$lib/stores/console';
+  import AppIcon from '../ui/AppIcon.svelte';
 
   function handleStart(): void {
     emit('start');
@@ -42,12 +44,37 @@
 </script>
 
 <div class="control-grid">
-  <button class="mc-btn primary small" onclick={handleStart} disabled={$serverStatus.running}>{$_('start')}</button>
-  <button class="mc-btn small" onclick={handleRestart} disabled={!$serverStatus.running}>{$_('restart')}</button>
+  <button class="mc-btn primary small" onclick={handleStart} disabled={$serverStatus.running}>
+    <span style="display: inline-flex; align-items: center; gap: 8px;">
+      <AppIcon name={appIcons.start} size={15} />
+      <span>{$_('start')}</span>
+    </span>
+  </button>
+  <button class="mc-btn small" onclick={handleRestart} disabled={!$serverStatus.running}>
+    <span style="display: inline-flex; align-items: center; gap: 8px;">
+      <AppIcon name={appIcons.refresh} size={15} />
+      <span>{$_('restart')}</span>
+    </span>
+  </button>
 </div>
-<button class="mc-btn danger small" onclick={handleStop} disabled={!$serverStatus.running}>{$_('stopServer')}</button>
-<button class="mc-btn danger small" style="margin-top: 4px; opacity: 0.8;" onclick={handleForceStop} disabled={!$serverStatus.running} title={$_('forceStopTooltip')}>{$_('forceStop')}</button>
-<button class="mc-btn warning small" style="margin-top: 8px;" onclick={handleWipe} disabled={$serverStatus.running}>{$_('wipeData')}</button>
+<button class="mc-btn danger small" onclick={handleStop} disabled={!$serverStatus.running}>
+  <span style="display: inline-flex; align-items: center; gap: 8px;">
+    <AppIcon name={appIcons.stop} size={15} />
+    <span>{$_('stopServer')}</span>
+  </span>
+</button>
+<button class="mc-btn danger small" style="margin-top: 4px; opacity: 0.8;" onclick={handleForceStop} disabled={!$serverStatus.running} title={$_('forceStopTooltip')}>
+  <span style="display: inline-flex; align-items: center; gap: 8px;">
+    <AppIcon name={appIcons.stop} size={15} />
+    <span>{$_('forceStop')}</span>
+  </span>
+</button>
+<button class="mc-btn warning small" style="margin-top: 8px;" onclick={handleWipe} disabled={$serverStatus.running}>
+  <span style="display: inline-flex; align-items: center; gap: 8px;">
+    <AppIcon name={appIcons.delete} size={15} />
+    <span>{$_('wipeData')}</span>
+  </span>
+</button>
 
 <div class="info-compact">
   <div class="info-row">
